@@ -22,6 +22,7 @@
 
             var dateObj = {
                 dateFormat: 'yy-mm-dd',
+                // dateFormat: 'dd-mm-yy',
                 changeYear: true,
                 changeMonth: true,
                 numberOfMonths: 1,

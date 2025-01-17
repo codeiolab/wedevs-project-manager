@@ -165,7 +165,6 @@ class Task {
 			'meta' => []
 		];
 
-
 		foreach ( $tasks as $key => $task ) {
 			$tasks[$key] = $this->fromat_task( $task );
 		}
@@ -220,8 +219,6 @@ class Task {
 			'creator'               => [ 'data' => $this->user_info( $task->created_by ) ],
 			'updater'               => [ 'data' => $this->user_info( $task->updated_by ) ],
         ];
-
-
 		
 		$items = $this->set_with_items( $items, $task );
 		$items = $this->set_fixed_items( $items, $task );

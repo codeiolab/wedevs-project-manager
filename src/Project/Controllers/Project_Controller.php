@@ -25,12 +25,12 @@ class Project_Controller {
 	use Transformer_Manager, Request_Filter, File_Attachment;
 
 	public function index( WP_REST_Request $request ) {
-		$per_page = intval( $request->get_param( 'per_page' ) );
-		$page     = intval( $request->get_param( 'page' ) );
+		$per_page = $request->get_param( 'per_page' );
+		$page     = $request->get_param( 'page' );
 		$status   = $request->get_param( 'status' );
 		$category = $request->get_param( 'category' );
 		$project_transform = $request->get_param( 'project_transform' );
- 
+
 		$per_page_from_settings = pm_get_setting( 'project_per_page' );
 		$per_page_from_settings = $per_page_from_settings ? $per_page_from_settings : 15;
 
@@ -216,13 +216,11 @@ class Project_Controller {
 		add_option('projectId_git_bit_hash_'.$project->id , sha1(strtotime("now").$project->id));
 		// Establishing relationships
 		$category_ids = intval( $request->get_param( 'categories' ) );
-		
 		if ( $category_ids ) {
 			$project->categories()->sync( $category_ids );
 		}
 
 		$assignees = pm_validate_assignee( $request->get_param( 'assignees' ) );
-
 		$assignees[] = [
 			'user_id' => wp_get_current_user()->ID,
 			'role_id' => 1, // 1 for manager
@@ -265,7 +263,7 @@ class Project_Controller {
 			$project->assignees()->detach();
 			$this->assign_users( $project, $assignees );
 		}
-
+		do_action( 'pm_project_update', $project, $request->get_params());
 		$resource = new Item( $project, new Project_Transformer );
 		$response = $this->get_response( $resource );
 		$response['message'] = pm_get_text('success_messages.project_updated');
@@ -324,7 +322,7 @@ class Project_Controller {
 	}
 
 	public function destroy( WP_REST_Request $request ) {
-		$id = intval( $request->get_param('id') );
+		$id = $request->get_param('id');
 
 		// Find the requested resource
 		$project =  Project::find( $id );

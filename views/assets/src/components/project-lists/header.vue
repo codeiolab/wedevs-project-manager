@@ -65,14 +65,17 @@
 </script>
 
 <style lang="less">
+    div[aria-describedby="pm-project-dialog"] {
+        z-index: 99999!important;
+    }
     .pm-page-wrapper .pm-overview-panel .pm-panel-header {
         border-radius: 3px 3px 0 0 !important;
     }
-
-    .pm-project-content {
-
-    }
     
+    .ui-menu .ui-menu-item-wrapper {
+        display: block;
+    }
+
 
     .ui-dialog {
         left: 50% !important;

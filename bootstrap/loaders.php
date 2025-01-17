@@ -121,6 +121,7 @@ function pm_seed_db() {
 
 function pm_register_routes() {
     $routes = Router::get_routes();
+    // dd($routes);
 
     WP_Router::register($routes);
 }

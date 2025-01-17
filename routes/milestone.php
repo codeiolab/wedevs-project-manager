@@ -25,3 +25,12 @@ $router->post( 'projects/{project_id}/milestones/{milestone_id}/delete', 'WeDevs
 
 $router->post( 'projects/{project_id}/milestones/privacy/{milestone_id}', 'WeDevs/PM/Milestone/Controllers/Milestone_Controller@privacy' )
 	->permission( ['WeDevs\PM\Core\Permissions\Edit_Milestone'] );
+
+
+$router->get( 'projects/{project_id}/payment-log?', 'WeDevs/PM/Milestone/Controllers/Milestone_Controller@payment_log' )
+    ->permission( ['WeDevs\PM\Core\Permissions\Access_Project'] );
+$router->post( 'projects/{project_id}/create-order', 'WeDevs/PM/Milestone/Controllers/Milestone_Controller@create_order');
+$router->post( 'projects/{project_id}/delete-manual-order', 'WeDevs/PM/Milestone/Controllers/Milestone_Controller@delete_manual_order');
+$router->get( 'projects/{project_id}/get-status', 'WeDevs/PM/Milestone/Controllers/Milestone_Controller@get_status');
+$router->post( 'projects/{project_id}/get-manual-order', 'WeDevs/PM/Milestone/Controllers/Milestone_Controller@get_manual_order');
+$router->post( 'projects/{project_id}/update-manual-order', 'WeDevs/PM/Milestone/Controllers/Milestone_Controller@update_manual_order');

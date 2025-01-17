@@ -6,8 +6,12 @@ export default {
 
     state: {
         isFetchMilestone: false,
+        isFetchPayments: false,
         is_milestone_form_active: false,
         milestones: [],
+        payments: [],
+        payment: {},
+        orderStatuses: [],
         milestone: {},
         blank_template: false,
         milestone_template: false,
@@ -38,6 +42,19 @@ export default {
             state.milestones = milestones;
             state.isFetchMilestone = true;
             state.blank_template = false;
+        },
+
+        setPayments (state, payments) {
+            state.payments = payments;
+            state.isFetchPayments = true;
+        },
+        setPayment (state, payment) {
+            state.payment = payment;
+        },
+        setOrderStatus (state, statuses) {
+            state.orderStatuses = statuses;
+            state.isFetchPayments = true;
+            // state.blank_template = false;
         },
 
         setMilestonesMeta(state, data){
@@ -105,6 +122,9 @@ export default {
 
         fetchMilestoneStatus (state, status) {
             state.isFetchMilestone = status;
+        },
+        fetchPaymentsStatus (state, status) {
+            state.isFetchPayments = status;
         }
     }
 };

@@ -5695,3 +5695,6 @@ a.pm-icon-tick.grey {
 }*/
 
 
+.pm-form-item.pm-project-role select {
+  min-width: 100px;
+}

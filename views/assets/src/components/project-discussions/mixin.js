@@ -196,13 +196,12 @@ export default {
                     if( res.status && res.status == 400 && res.responseJSON.error_type === 'svg_xss' ){
                         pm.Toastr.error(res.responseJSON.message);
                     }
-
                     if ( res.status == 400 ) {
                         var params = res.responseJSON.data.params;
                         for ( var obj in params ){
                             pm.Toastr.error(params[obj][0]);
                         }
-                    }                  
+                    }
                     self.submit_disabled = false;
                 }
             }
