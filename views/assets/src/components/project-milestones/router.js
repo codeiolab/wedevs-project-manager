@@ -7,6 +7,7 @@ weDevsPmRegisterModule('projectMilestones', 'project-milestones');
 // }
 
 import milestones_route from './milestones.vue'
+import test_route from './payment.vue'
 
 weDevsPMRegisterChildrenRoute('projects', 
     [
@@ -22,6 +23,16 @@ weDevsPMRegisterChildrenRoute('projects',
                     name: 'milestone_pagination',
                 },
             ]
+        }
+    ]
+)
+
+weDevsPMRegisterChildrenRoute('projects', 
+    [
+        {
+            path: ':project_id/payments/', 
+            component: test_route,
+            name: 'payments',
         }
     ]
 )

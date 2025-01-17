@@ -113,6 +113,74 @@ export default {
 
             self.httpRequest(request);
          },
+         getPayments (args) {
+            var self = this;
+            self.fetchReport = false;
+            var start_date = self.$route.query.start_date;
+            var end_date = self.$route.query.end_date;
+            
+            var args       = jQuery.extend(true, args );
+            var conditions = self.generateConditions(args.conditions);
+
+            // var conditions = self.generateConditions(conditions);
+
+            var request = {
+                url: self.base_url + 'pm/v2/projects/'+self.project_id+'/payment-log?'+ conditions,
+
+                success (res) {
+                    self.$store.commit( 'projectMilestones/setPayments', res.data );
+                }
+            }
+
+            self.httpRequest(request);
+        },
+
+        getStatus(){
+            var self = this;
+
+            var request = {
+                url: self.base_url + 'pm/v2/projects/'+self.project_id+'/get-status',
+                success (res) {
+                    self.$store.commit( 'projectMilestones/setOrderStatus', res.data );
+                    // self.$store.commit('projectMilestones/setMilestonesMeta', res.meta.pagination);
+                }
+            }
+
+            self.httpRequest(request);
+        },
+
+        getManualOrder(args){
+            var self = this;
+
+            var request_data = {
+                url: self.base_url + 'pm/v2/projects/'+self.project_id+'/get-manual-order',
+                type: 'POST',
+                data: args.data,
+                success (res) {
+                    var data = res.data[0];
+                    self.$store.commit( 'projectMilestones/setPayment', data );
+                    // var purchaseDate = data.purchase_date;
+                    var purchaseDate = data.date;
+                    // purchaseDate = self.convertDateFormat(purchaseDate);
+                    purchaseDate = purchaseDate;
+                    self.manualOrderUpdateData['purchaseDate'] = purchaseDate;
+                    self.manualOrderUpdateData['hour'] = data.hour;
+                    self.manualOrderUpdateData['rate'] = data.rate;
+                    self.manualOrderUpdateData['refID'] = data.ref_id;
+                    self.manualOrderUpdateData['orderId'] = data.order_no;
+                    self.manualOrderUpdateData['orderStatus'] = data.status_name;
+
+                    self.showManualAdjustmentModalUpdate = true;
+                },
+                error (res) {
+                    // console.log("error : ",res);
+                    // location.reload();
+                }
+            };
+
+            // self.getResults(args);
+            this.httpRequest(request_data);
+        },
 
          getSelfMilestones(){
             var self = this,
@@ -130,6 +198,102 @@ export default {
             }
 
             self.getMilestones(args);
+        },
+        getSelfPayments(){
+            var self = this,
+            args = {
+                conditions :{
+                    // with:'discussion_boards,task_lists',
+                    per_page: 20,
+                    page:self.setCurrentPageNumber(),
+                    start_date: this.$route.query.start_date,
+                    end_date: this.$route.query.end_date,
+                },
+                callback: function(){
+                    self.$root.$store.state.projectMilestoneLoaded = true;
+                    pm.NProgress.done();
+                    self.templateAction();
+                }
+            }
+
+            self.getPayments(args);
+        },
+
+        createOrder(args){
+            
+            var self = this;
+
+            var request_data = {
+                url: self.base_url + 'pm/v2/projects/'+ +self.project_id+'/create-order',
+                type: 'POST',
+                data: args.data,
+                success (res) {
+                    var response = res.success;
+                    location.reload();
+                },
+                error (res) {
+                    location.reload();
+                }
+            };
+
+            this.httpRequest(request_data);
+        },
+
+        createManualOrder(args){
+            var self = this;
+
+            var request_data = {
+                url: self.base_url + 'pm/v2/projects/'+ +self.project_id+'/create-order',
+                type: 'POST',
+                data: args.data,
+                success (res) {
+                    var response = res.success;
+                    location.reload();
+                },
+                error (res) {
+                    location.reload();
+                }
+            };
+
+            this.httpRequest(request_data);
+        },
+        apiCallForManualOrderUpdate(args){
+            var self = this;
+
+            var request_data = {
+                url: self.base_url + 'pm/v2/projects/'+ +self.project_id+'/update-manual-order',
+                type: 'POST',
+                data: args.data,
+                success (res) {
+                    var response = res.success;
+                    location.reload();
+                },
+                error (res) {
+                    // console.log("error : ",res);
+                    location.reload();
+                }
+            };
+
+            this.httpRequest(request_data);
+        },
+        deleteManualOrder(args){
+            var self = this;
+
+            var request_data = {
+                url: self.base_url + 'pm/v2/projects/'+ +self.project_id+'/delete-manual-order',
+                type: 'POST',
+                data: args.data,
+                success (res) {
+                    // var response = res.success;
+                    location.reload();
+                },
+                error (res) {
+                    // console.log("error : ",res);
+                    location.reload();
+                }
+            };
+
+            this.httpRequest(request_data);
         },
 
         addMeta (milestone, index) {

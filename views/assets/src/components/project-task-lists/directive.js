@@ -130,6 +130,7 @@ var PM_Task = {
         var $ = jQuery;
         $( '.pm-date-field').datepicker({
             dateFormat: 'yy-mm-dd',
+            // dateFormat: 'dd-mm-yy',
             changeMonth: true,
             changeYear: true,
             yearRange: '-50:+5',
@@ -140,6 +141,7 @@ var PM_Task = {
 
         $( ".pm-date-picker-from" ).datepicker({
             dateFormat: 'yy-mm-dd',
+            // dateFormat: 'dd-mm-yy',
             changeYear: true,
             changeMonth: true,
             numberOfMonths: 1,
@@ -153,6 +155,7 @@ var PM_Task = {
 
         $( ".pm-date-picker-to" ).datepicker({
             dateFormat: 'yy-mm-dd',
+            // dateFormat: 'dd-mm-yy',
             changeMonth: true,
             changeYear: true,
             numberOfMonths: 1,
@@ -166,6 +169,7 @@ var PM_Task = {
 
         $( ".pm-date-time-picker-from" ).datepicker({
             dateFormat: 'yy-mm-dd',
+            // dateFormat: 'dd-mm-yy',
             changeYear: true,
             changeMonth: true,
             numberOfMonths: 1,
@@ -179,6 +183,7 @@ var PM_Task = {
 
         $( ".pm-date-time-picker-to" ).datepicker({
             dateFormat: 'yy-mm-dd',
+            // dateFormat: 'dd-mm-yy',
             changeMonth: true,
             changeYear: true,
             numberOfMonths: 1,

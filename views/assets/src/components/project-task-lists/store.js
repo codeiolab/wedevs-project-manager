@@ -57,6 +57,7 @@ export default {
 
             return index;
         },
+        totalLoggedTimes: null
     },
 
     /**
@@ -528,6 +529,9 @@ export default {
         setLists (state, lists) {
             state.lists = lists; 
             state.isListFetch = true;
+        },
+        setTotalLoggedTimes (state, loggedTimes) {
+            state.totalLoggedTimes = loggedTimes;
         },
         setList(state, list){
             state.lists = [list];

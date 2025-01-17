@@ -7,7 +7,7 @@
             <div class="pm-card pm-card-default card-overdue-task">
               <img :src="getAssetUrl( '/images/overdue_task.svg' )" height="50"> <br>
               <h3>
-                {{ __( 'Overdue Task(s)', 'wedevs-project-manager' ) }}
+                {{ __( 'Overdue Tasks(s)', 'wedevs-project-manager' ) }}
                 <Badge />
               </h3>
               <div class="project-meta-text" v-html="__( 'Generate a report based on <strong>tasks</strong> which are <strong>pending</strong> beyond due dates.', 'wedevs-project-manager' )"></div>

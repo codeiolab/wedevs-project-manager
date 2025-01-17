@@ -3,6 +3,7 @@ weDevsPmRegisterModule("myTask", 'my-tasks');
 import mixin from './mixin';
 
 // PmProMixin.myTasks = mixin;
+///Users/welabs/Projects/key4ce/wp-content/plugins/key4ce-pm-pro/views/assets/src/components/reports/time-log.vue
 
 import complete_task from './complete-task.vue';
 import outstanding_task from './outstanding-task.vue';
@@ -10,6 +11,7 @@ import current_task from './search-task.vue';
 import activities from './activities.vue';
 import overview from './overview.vue';
 import mytaskTemplete from './my-tasks.vue';
+// import time_log from './key4ce-pm-pro/views/assets/src/components/reports/time-log.vue';
 
 if ( !PM_Vars.is_pro ) {
     require('@components/tasks-report/router');

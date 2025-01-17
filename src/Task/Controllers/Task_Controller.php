@@ -49,11 +49,11 @@ class Task_Controller {
     }
 
     public function index( WP_REST_Request $request ) {
-        $project_id = intval( $request->get_param( 'project_id' ) );
-        $per_page   = intval( $request->get_param( 'per_page' ) );
+        $project_id = $request->get_param( 'project_id' );
+        $per_page   = $request->get_param( 'per_page' );
         $per_page   = $per_page ? $per_page : 5;
-        $page       = intval( $request->get_param( 'page' ) );
-        $search     = sanitize_text_field( $request->get_param( 's' ) );
+        $page       = $request->get_param( 'page' );
+        $search     = $request->get_param( 's' );
 
         Paginator::currentPageResolver(function () use ($page) {
             return $page;
@@ -329,7 +329,6 @@ class Task_Controller {
         return $this->task_update( $request->get_params() );
     }
 
-   
     public static function task_update( $params ) {
         $task_id    = intval( $params['task_id'] );
 
@@ -506,7 +505,7 @@ class Task_Controller {
 
     public function destroy( WP_REST_Request $request ) {
         // Grab user inputs
-        $project_id = intval( $request->get_param( 'project_id' ) );
+        $project_id = $request->get_param( 'project_id' );
         $task_id    = $request->get_param( 'task_id' );
 
         // Select the task
@@ -597,7 +596,7 @@ class Task_Controller {
     }
 
     public function attach_users( WP_REST_Request $request ) {
-        $project_id = intval( $request->get_param( 'project_id' ) );
+        $project_id = $request->get_param( 'project_id' );
         $task_id    = $request->get_param( 'task_id' );
         $user_ids   = $request->get_param( 'users' );
 
@@ -622,7 +621,7 @@ class Task_Controller {
     }
 
     public function detach_users( WP_REST_Request $request ) {
-        $project_id = intval( $request->get_param( 'project_id' ) );
+        $project_id = $request->get_param( 'project_id' );
         $task_id    = $request->get_param( 'task_id' );
         $user_ids   = $request->get_param( 'users' );
 
@@ -662,7 +661,7 @@ class Task_Controller {
     }
 
     public function privacy( WP_REST_Request $request ) {
-        $project_id = intval( $request->get_param( 'project_id' ) );
+        $project_id = $request->get_param( 'project_id' );
         $task_id = $request->get_param( 'task_id' );
         $privacy = $request->get_param( 'is_private' );
         $task = Task::find( $task_id );
@@ -674,7 +673,6 @@ class Task_Controller {
     }
 
     public function task_sorting( WP_REST_Request $request ) {
-
         $project_id = intval( $request->get_param( 'project_id' ) );
         $list_id    = intval( $request->get_param( 'list_id' ) );
         $task_id    = intval($request->get_param( 'task_id' ) );
@@ -738,13 +736,13 @@ class Task_Controller {
 
         global $wpdb;
 
-        $status       = sanitize_text_field($request->get_param('status'));
-        $due_date     = sanitize_text_field($request->get_param('dueDate'));
-        $assignees    = array_map('intval', (array) $request->get_param('users'));
-        $lists        = array_map('intval', (array) $request->get_param('lists'));
-        $project_id   = intval($request->get_param('project_id'));
-        $title        = sanitize_text_field($request->get_param('title'));
-
+        $status       = $request->get_param('status');
+        //$board_status = $request->get_param('board_status');
+        $due_date     = $request->get_param('dueDate');
+        $assignees    = $request->get_param('users');
+        $lists        = $request->get_param('lists');
+        $project_id   = $request->get_param('project_id');
+        $title        = $request->get_param('title');
         $tb_lists     = pm_tb_prefix() . 'pm_boards';
 
 
@@ -859,8 +857,8 @@ class Task_Controller {
         $ct_per_page   = pm_get_setting( 'complete_tasks_per_page' );
         $ct_per_page   = empty( $per_page ) ? 20 : intval( $per_page );
 
-        $page         = intval($request->get_param('page'));
-        $project_id   = intval($request->get_param('project_id'));
+        $page         = $request->get_param('page');
+        $project_id   = $request->get_param('project_id');
 
         Paginator::currentPageResolver(function () use ($page) {
             return $page;
@@ -884,12 +882,11 @@ class Task_Controller {
         }
 
         $filter = [
-            'status' => sanitize_key( $request->get_param('status') ),
-            'due_date' =>  sanitize_text_field( $request->get_param('dueDate') ),
-            'users' => is_array( $request->get_param('users') ) ? array_map( 'intval', $request->get_param('users') )  : ( is_numeric( $request->get_param('users') ) ? intval( $request->get_param('users') ) : null ),
-            'title' => sanitize_text_field( $request->get_param('title') )
+            'status' => $request->get_param('status'),
+            'due_date' =>  $request->get_param('dueDate'),
+            'users' => $request->get_param('users'),
+            'title' => $request->get_param('title')
         ];
-       
 
         //get total complete and incomplete tasks count
         $lists_tasks_count = ( new Task_List_Controller )->get_lists_tasks_count( $list_ids, $project_id, $filter );
@@ -932,9 +929,8 @@ class Task_Controller {
 
     public function activities( WP_REST_Request $request ) {
 
-        $current_page = intval( $request->get_param( 'activityPage' ) );
-        $task_id = intval( $request->get_param( 'task_id' ) );
-
+        $current_page = $request->get_param( 'activityPage' );
+        $task_id = $request->get_param( 'task_id' );
         $per_page = 10;
 
         Paginator::currentPageResolver(function () use ($current_page) {
@@ -1335,7 +1331,7 @@ class Task_Controller {
         $task_ids   = array_map( 'intval', (array)$request->get_param( 'task_ids' ));
         $project_id = intval( $request->get_param( 'project_id' ) );
         $status     = intval( $request->get_param( 'status' ) );
-
+        
         if ( (int) $status ) {
             $task_ids = $this->get_complete_task_ids( [$list_id], $project_id, $task_ids );   
         } else {

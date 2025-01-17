@@ -23,8 +23,8 @@
                 limit_date = ( self.dependency == 'pm-datepicker-from' ) ? "maxDate" : "minDate";
 
             jQuery( self.$el ).datepicker({
-                dateFormat: 'yy-mm-dd',
-                // dateFormat: 'dd-mm-yy',
+                // dateFormat: 'yy-mm-dd',
+                dateFormat: 'dd-mm-yy',
                 changeYear: true,
                 changeMonth: true,
                 numberOfMonths: 1,

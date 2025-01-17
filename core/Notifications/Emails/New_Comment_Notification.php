@@ -75,7 +75,6 @@ class New_Comment_Notification extends Email {
                             ->where( 'entity_id',  $request['commentable_id'])
                             ->where( 'meta_key', 'title' )
                             ->first();
-                            
             $title = $filemeta->meta_value ?? '';
         }
 

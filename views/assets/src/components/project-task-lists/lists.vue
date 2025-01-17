@@ -13,7 +13,6 @@
         
         <pm-header></pm-header>
         <pm-menu></pm-menu>
-        
         <div v-if="isFetchProject" class="list-content-wrap">
             <div class="list-content-body">
                 <div class="content">

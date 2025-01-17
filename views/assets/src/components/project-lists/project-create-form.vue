@@ -1,7 +1,6 @@
 <template>
     <div>
         <form action="" method="post" class="pm-form pm-project-form" @submit.prevent="projectFormAction();">
-
             <div class="item project-name">
                 <!-- v-model="project_name" -->
                 <input type="text" v-model="project.title"  id="project_name" :placeholder="name_of_the_project" size="45" />
@@ -14,10 +13,16 @@
                     <option v-for="category in categories" :value="category.id" :key="category.id" >{{ category.title }}</option>
                 </select>
             </div>
-
             <div class="pm-form-item item project-detail">
                 <!-- v-model="project_description" -->
                 <textarea v-model="project_description"  class="pm-project-description" id="" rows="5" :placeholder="details_of_project"></textarea>
+            </div>
+             <div class="item project-name">
+                <input type="text" v-model="project.project_hours" :placeholder="project_hour_placeholder" />
+            </div>
+
+            <div class="item project-name">
+                <input type="text" v-model="project.project_hourly_rate" :placeholder="hourly_rate_placeholder" />
             </div>
             <div class="pm-project-form-users-wrap" v-if="selectedUsers.length">
                 <div class="pm-form-item pm-project-role" v-if="show_role_field">
@@ -70,260 +75,325 @@
 </template>
 
 <style lang="less">
-    .pm-project-form {
-        .project-department {
-            label {
-                line-height: 1;
-                display: block;
-                margin-bottom: 5px;
-            }
-            select {
-                display: block;
-            }
-        }
-        .pm-project-form-users-wrap {
-            overflow: hidden;
-            .pm-project-role {
-                max-height: 150px;
-                overflow: auto;
-
-                .user-td {
-                	width: 115px;
-                	select {
-                		padding-left: 10px !important;
-                	}
-                }
-            }
-        }
+.pm-project-form {
+  .project-department {
+    label {
+      line-height: 1;
+      display: block;
+      margin-bottom: 5px;
     }
+    select {
+      display: block;
+    }
+  }
+  .pm-project-form-users-wrap {
+    overflow: hidden;
+    .pm-project-role {
+      max-height: 150px;
+      overflow: auto;
+
+      .user-td {
+        width: 115px;
+        select {
+          padding-left: 10px !important;
+        }
+      }
+    }
+  }
+}
 </style>
 
 <script>
-    import directive from './directive.js';
-    import project_new_user_form from './project-new-user-form.vue';
-    import Mixins from './mixin';
+import directive from "./directive.js";
+import project_new_user_form from "./project-new-user-form.vue";
+import Mixins from "./mixin";
 
-    var new_project_form = {
-
-        props: { //projectFormStatus
-            project: {
-                type: Object,
-                default () {
-                    return {};
-                }
-            }
-        },
-
-        data () {
-            return {
-                project_name: '',
-                project_cat: 0,
-                project_description: typeof this.project.description == 'undefined' ? '' : this.project.description.content,
-                project_notify: false,
-                assignees: [],
-                show_spinner: false,
-                name_of_the_project: __('Name of the project', 'wedevs-project-manager'),
-                details_of_project: __( 'Some details about the project (optional)', 'wedevs-project-manager'),
-                search_user: __( 'Search users...', 'wedevs-project-manager'),
-                create_new_user: __( 'Create a new user', 'wedevs-project-manager'),
-                add_new_project: __( 'Add New Project', 'wedevs-project-manager'),
-                update_project: __( 'Update Project', 'wedevs-project-manager'),
-                client: __("Client", 'wedevs-project-manager'), // Dont Remove this one its require for Client translation
-            }
-        },
-        components: {
-            'project-new-user-form': project_new_user_form,
-        },
-        created () {
-            this.setProjectUser();
-        },
-        computed: {
-            roles () {
-                return this.$root.$store.state.roles;
-            },
-
-            categories () {
-                return this.$root.$store.state.categories;
-            },
-
-            selectedUsers () {
-                if(!this.project.hasOwnProperty('assignees')) {
-                    return this.$store.state.assignees;
-                } else {
-                    var projects = this.$store.state.projects;
-                    var index = projects.findIndex(i => i.id == this.project.id);
-                    if (index !== -1) {
-                        return projects[index].assignees.data;
-                    }
-                }
-            },
-
-            project_category: {
-                get () {
-                    if ( this.project.hasOwnProperty('id') ) {
-                        if (
-                            typeof this.project.categories !== 'undefined'
-                            &&
-                            this.project.categories.data.length
-                        ) {
-
-                            this.project_cat = this.project.categories.data[0].id;
-
-                            return this.project.categories.data[0].id;
-                        }
-                    }
-
-                    return this.project_cat;
-                },
-
-                set (cat) {
-                    this.project_cat = cat;
-                }
-            },
-
-            show_role_field () {
-                return typeof PM_BP_Vars !== 'undefined' ? PM_BP_Vars.show_role_field : true;
-            },
-
-            getProjectDetails(){
-                try {
-                    var project = this.$store.state.project ;
-                    if(this.$router.currentRoute.fullPath == '/projects/active'){
-                        this.project_description = '' ;
-                    }else{
-                        this.project_description = project.description.content ;
-                        return project ;
-                    }
-                }catch (e) {}
-            }
-
-        },
-
-        methods: {
-
-            deleteUser (del_user) {
-                if ( !this.canUserEdit(del_user.id) ) {
-                    return;
-                }
-
-                this.$store.commit(
-                    'afterDeleteUserFromProject',
-                    {
-                        project_id: this.project_id,
-                        user_id: del_user.id
-                    }
-                );
-            },
-            canUserEdit (user) {
-
-                if (this.has_manage_capability()) {
-                    return true;
-                }
-
-                if (user.manage_capability) {
-                    return false;
-                }
-
-                if (this.current_user.data.ID == user.id) {
-                    return false;
-                }
-
-                return true
-
-            },
-            /**
-             * Action after submit the form to save and update
-             * @return {[void]}
-             */
-            projectFormAction () {
-                if ( this.show_spinner ) {
-                    return;
-                }
-
-                if ( !this.project.title ) {
-                    pm.Toastr.error(__('Project title is required.', 'wedevs-project-manager'));
-                    return;
-                }
-
-                this.show_spinner = true;
-
-                var args = {
-                    data: {
-                        'title': this.project.title,
-                        'categories': this.project_cat ? [this.project_cat]: null,
-                        'description': this.project_description,
-                        'notify_users': this.project_notify,
-                        'assignees': this.formatUsers(this.selectedUsers),
-                        'status': this.project.status,
-                        'department_id': this.project.department_id
-                    }
-                }
-                
-                var self = this;
-                if (this.project.hasOwnProperty('id')) {
-                    args.data.id = this.project.id;
-                    args.callback = function ( res ) {
-                        self.show_spinner = false;
-                        self.$store.commit('setProjectUsers', res.data.assignees.data);
-                        self.closePopper('pm-project-update-wrap');
-                        self.$emit('makeFromClose', false);
-                    }
-                    this.updateProject ( args );
-
-
-                } else {
-                    args.callback = function(res) {
-                        // console.log(res.status);
-                        // if ( res.status !== 200 ) {
-                        //     self.show_spinner = false;
-                        //     return;
-                        // }
-                        self.project.title = '';
-                        self.project_cat = 0;
-                        self.project.description = ''
-                        self.project_notify = [];
-                        self.project.status = '';
-                        self.show_spinner = false;
-                        self.closePopper('pm-project-update-wrap');
-                        self.$router.push({
-                            name: 'pm_overview',
-                            params: {
-                                project_id: res.data.id
-                            }
-                        });
-                    }
-
-                    this.newProject(args);
-                }
-            },
-            setProjectUser () {
-                if ( this.project.hasOwnProperty('id') ) {
-                    this.$root.$store.commit('setSeletedUser', this.project.assignees.data);
-                } else {
-                    this.$root.$store.commit('resetSelectedUsers');
-                }
-            },
-
-            closeForm () {
-
-                this.closePopper();
-                if(!this.project.hasOwnProperty('id')) {
-                    this.project.title = '';
-                    this.project_cat = 0;
-                    this.project.description = ''
-                    this.project_notify = [];
-                    this.project.status = '';
-                    this.$store.commit('setSeletedUser', []);
-                    jQuery( "#pm-project-dialog" ).dialog('close');
-                }
-                this.showHideProjectForm(false);
-                this.$emit('makeFromClose', false)
-            }
-        },
-        updated () {
-            this.getProjectDetails ;
-        }
+var new_project_form = {
+  props: {
+    //projectFormStatus
+    project: {
+      type: Object,
+      default() {
+        return {};
+      }
     }
+  },
 
-    export default new_project_form;
+  data() {
+    return {
+      project_name: "",
+      project_cat: 0,
+      project_description:
+        typeof this.project.description == "undefined"
+          ? ""
+          : this.project.description.content,
+      project_notify: false,
+      // project_hours: typeof this.project.project_hours == "undefined" ? "" : this.setMinuteToTime(this.project.project_hours.meta_value),
+      // project_hours_in_seconds: '',
+      // project_hour_rate: typeof this.project.project_hourly_rate == "undefined" ? "" : this.project.project_hourly_rate.meta_value,
+      assignees: [],
+      show_spinner: false,
+      name_of_the_project: __("Name of the project", "wedevs-project-manager"),
+      project_hour_placeholder: "Project Hours",
+      hourly_rate_placeholder: "Hourly Rate",
+      details_of_project: __(
+        "Some details about the project (optional)",
+        "wedevs-project-manager"
+      ),
+      search_user: __("Search users...", "wedevs-project-manager"),
+      create_new_user: __("Create a new user", "wedevs-project-manager"),
+      add_new_project: __("Add New Project", "wedevs-project-manager"),
+      update_project: __("Update Project", "wedevs-project-manager"),
+      client: __("Client", "wedevs-project-manager") // Dont Remove this one its require for Client translation
+    };
+  },
+  components: {
+    "project-new-user-form": project_new_user_form
+  },
+  created() {
+    this.setProjectUser();
+  },
+  computed: {
+    roles() {
+      return this.$root.$store.state.roles;
+    },
+
+    categories() {
+      return this.$root.$store.state.categories;
+    },
+
+    selectedUsers() {
+      if (!this.project.hasOwnProperty("assignees")) {
+        return this.$store.state.assignees;
+      } else {
+        var projects = this.$store.state.projects;
+        var index = projects.findIndex(i => i.id == this.project.id);
+        if (index !== -1) {
+          return projects[index].assignees.data;
+        }
+      }
+    },
+
+    project_category: {
+      get() {
+        if (this.project.hasOwnProperty("id")) {
+          if (
+            typeof this.project.categories !== "undefined" &&
+            this.project.categories.data.length
+          ) {
+            this.project_cat = this.project.categories.data[0].id;
+
+            return this.project.categories.data[0].id;
+          }
+        }
+
+        return this.project_cat;
+      },
+
+      set(cat) {
+        this.project_cat = cat;
+      }
+    },
+
+    show_role_field() {
+      return typeof PM_BP_Vars !== "undefined"
+        ? PM_BP_Vars.show_role_field
+        : true;
+    },
+
+    getProjectDetails() {
+      try {
+        var project = this.$store.state.project;
+        if (this.$router.currentRoute.fullPath == "/projects/active") {
+          this.project_description = "";
+        } else {
+          this.project_description = project.description.content;
+          return project;
+        }
+      } catch (e) {}
+    }
+  },
+
+  methods: {
+    setProjectHour(){
+      this.project_hours = this.project.hasOwnProperty("id") && this.project.project_hours.meta_value ? this.setMinuteToTime(this.project.project_hours.meta_value) : '';
+    },
+    setProjectHourlyRate(){
+      this.project_hour_rate = this.project.hasOwnProperty("id") && this.project.project_hourly_rate.meta_value ? this.project.project_hourly_rate.meta_value : '';
+    },
+    validation ($ele) {
+        var value = $ele.target.value;
+        var hasColon = value.indexOf(":");
+
+        if(hasColon == -1) {
+            value = value.replace(/[^0-9]/g,'');
+            this.time = value;
+            this.project_hours_in_seconds = value*60;
+            console.log( this.project_hours_in_seconds  );
+            return;
+        }
+
+        value = value.replace(/[^:0-9]/g,'');
+
+        if ( (value.split(":").length - 1) > 1 ) {
+            this.time = value.slice(0, -1);
+            this.project_hours_in_seconds = this.timeTominute( this.time );
+            return;
+        }
+
+        this.time = value;
+
+        let replacePart = ':';
+        let firstPart = value.substr( 0, value.indexOf(replacePart) );
+        let lastPart = value.substr( value.indexOf(replacePart) + replacePart.length );
+
+        if(lastPart != '' && lastPart>59) {
+            this.time = value.slice(0, -1);
+            this.project_hours_in_seconds = this.timeTominute( this.time );
+            return;
+        }
+
+        this.project_hours_in_seconds = this.timeTominute( this.time );
+
+    },
+
+    timeTominute ( time ) {
+        let replacePart = ':';
+        let firstPart = time.substr( 0, time.indexOf(replacePart) );
+        let lastPart = time.substr( time.indexOf(replacePart) + replacePart.length );
+
+        lastPart = lastPart ? parseInt(lastPart) : 0;
+        firstPart = firstPart ? parseInt( firstPart ) : 0;
+
+        return parseInt(firstPart)*60+lastPart;
+    },
+    setMinuteToTime (minute) {
+        minute = minute ? parseInt( minute ) : 0;
+        let time = this.stringToTime( minute*60 );
+
+        return `${time.hours}:${time.minutes}`;
+    },
+    deleteUser(del_user) {
+      if (!this.canUserEdit(del_user.id)) {
+        return;
+      }
+
+      this.$store.commit("afterDeleteUserFromProject", {
+        project_id: this.project_id,
+        user_id: del_user.id
+      });
+    },
+    canUserEdit(user) {
+      if (this.has_manage_capability()) {
+        return true;
+      }
+
+      if (user.manage_capability) {
+        return false;
+      }
+
+      if (this.current_user.data.ID == user.id) {
+        return false;
+      }
+
+      return true;
+    },
+    /**
+     * Action after submit the form to save and update
+     * @return {[void]}
+     */
+    projectFormAction() {
+      if (this.show_spinner) {
+        return;
+      }
+
+      if (!this.project.title) {
+        pm.Toastr.error(
+          __("Project title is required.", "wedevs-project-manager")
+        );
+        return;
+      }
+
+      this.show_spinner = true;
+
+      var args = {
+        data: {
+          title: this.project.title,
+          categories: this.project_cat ? [this.project_cat] : null,
+          description: this.project_description,
+          notify_users: this.project_notify,
+          project_hours: this.project.project_hours,
+          project_hourly_rate: this.project.project_hourly_rate,
+          assignees: this.formatUsers(this.selectedUsers),
+          status: this.project.status,
+          department_id: this.project.department_id
+        }
+      };
+
+      var self = this;
+      if (this.project.hasOwnProperty("id")) {
+        args.data.id = this.project.id;
+        args.callback = function(res) {
+          self.show_spinner = false;
+          self.$store.commit("setProjectUsers", res.data.assignees.data);
+          self.closePopper("pm-project-update-wrap");
+          self.$emit("makeFromClose", false);
+        };
+        this.updateProject(args);
+        pmBus.$emit('pm_after_update_project');
+      } else {
+        args.callback = function(res) {
+          // console.log(res.status);
+          // if ( res.status !== 200 ) {
+          //     self.show_spinner = false;
+          //     return;
+          // }
+          self.project.title = "";
+          self.project_cat = 0;
+          self.project.description = "";
+          self.project_notify = [];
+          self.project.status = "";
+          self.show_spinner = false;
+          self.closePopper("pm-project-update-wrap");
+          self.$router.push({
+            name: "pm_overview",
+            params: {
+              project_id: res.data.id
+            }
+          });
+        };
+
+        this.newProject(args);
+        pmBus.$emit('pm_after_create_project');
+      }
+    },
+    setProjectUser() {
+      if (this.project.hasOwnProperty("id")) {
+        this.$root.$store.commit("setSeletedUser", this.project.assignees.data);
+      } else {
+        this.$root.$store.commit("resetSelectedUsers");
+      }
+    },
+
+    closeForm() {
+      this.closePopper();
+      if (!this.project.hasOwnProperty("id")) {
+        this.project.title = "";
+        this.project_cat = 0;
+        this.project.description = "";
+        this.project_notify = [];
+        this.project.status = "";
+        this.$store.commit("setSeletedUser", []);
+        jQuery("#pm-project-dialog").dialog("close");
+      }
+      this.showHideProjectForm(false);
+      this.$emit("makeFromClose", false);
+    }
+  },
+  updated() {
+    this.getProjectDetails;
+  }
+};
+
+export default new_project_form;
 </script>
